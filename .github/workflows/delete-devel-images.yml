@@ -6,7 +6,6 @@ on:
 
 env:
   DOCKER_REPOSITORY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   delete-image:
@@ -28,11 +27,11 @@ jobs:
     
       - name: Delete Docker Image
         run: |
-          IMAGE_ID=${IMAGE_NAME}:$(echo ${REF##*/} | tr '/' '-')
+          IMAGE_ID=${{ env.DOCKER_REPOSITORY }}/${{ github.repository }}:${{ github.event.ref }}
           echo "Check image exists : ${IMAGE_ID}"
-          docker manifest inspect ${IMAGE_ID} >/dev/null 2>&1 || return 0
+          trap 'echo "image doesnt exists" >> "$GITHUB_OUTPUT"' EXIT
+          docker manifest inspect ${IMAGE_ID} >/dev/null 2>&1
+          trap '' EXIT
           echo "Deleting image : ${IMAGE_ID}"
           docker rmi ${IMAGE_ID}
-        env:
-          REF: ${{ github.event.ref }}
 
