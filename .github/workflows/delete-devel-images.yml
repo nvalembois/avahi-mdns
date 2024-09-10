@@ -14,17 +14,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+    if: startsWith(github.event.ref_type, 'branch')  # Vérifie que le type de référence supprimée est bien une branche
     steps:
-      - name: Check if the deleted ref is a branch
-        if: startsWith(github.event.ref_type, 'branch')  # Vérifie que le type de référence supprimée est bien une branche
-        run: echo "Branch ${GITHUB_REF} has been deleted."
-
-      - name: Check if ref is a branch
-        if: startsWith(github.event.ref, 'refs/heads/')
-        run: echo "Branch ${GITHUB_REF} has been deleted."
-
-      - name: Debug
-        run: env
+      - name: Display info
+        run: echo "Branch ${{ github.event.ref }} has been deleted."
      
       - name: Login to registry ${{ env.DOCKER_REPOSITORY }}
         uses: docker/login-action@v3  # https://github.com/docker/login-action
@@ -35,8 +28,11 @@ jobs:
     
       - name: Delete Docker Image
         run: |
-          IMAGE_ID=${IMAGE_NAME}:$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-')
+          IMAGE_ID=${IMAGE_NAME}:$(echo ${REF##*/} | tr '/' '-')
           echo "Check image exists : ${IMAGE_ID}"
           docker manifest inspect ${IMAGE_ID} >/dev/null 2>&1 || return 0
           echo "Deleting image : ${IMAGE_ID}"
           docker rmi ${IMAGE_ID}
+        env:
+          REF: ${{ github.event.ref }}
+
