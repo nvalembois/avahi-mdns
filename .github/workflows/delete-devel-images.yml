@@ -13,25 +13,26 @@ jobs:
     permissions:
       contents: read
       packages: write
-    if: startsWith(github.event.ref_type, 'branch')  # Vérifie que le type de référence supprimée est bien une branche
+    if: github.event.ref_type == 'branch'  # Vérifie que le type de référence supprimée est bien une branche
     steps:
       - name: Display info
         run: echo "Branch ${{ github.event.ref }} has been deleted."
-     
-      - name: Login to registry ${{ env.DOCKER_REPOSITORY }}
-        uses: docker/login-action@v3  # https://github.com/docker/login-action
-        with:
-            registry: ${{ env.DOCKER_REPOSITORY }}
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
     
-      - name: Delete Docker Image
+      - name: Delete Docker Image from GHCR
         run: |
-          IMAGE_ID=${{ env.DOCKER_REPOSITORY }}/${{ github.repository }}:${{ github.event.ref }}
-          echo "Check image exists : ${IMAGE_ID}"
-          trap 'echo "image doesnt exists" >> "$GITHUB_OUTPUT"' EXIT
-          docker manifest inspect ${IMAGE_ID} >/dev/null 2>&1
-          trap '' EXIT
-          echo "Deleting image : ${IMAGE_ID}"
-          docker rmi ${IMAGE_ID}
+          IMAGE_TAG=$(echo ${{ github.event.ref }} | tr '/' '-')
+          echo "Deleting image ${{ github.repository }} with tag $IMAGE_TAG from ghcr.io..."
+          
+          # Récupère l'ID du package de l'image
+          PACKAGE_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/orgs/YOUR_ORG/packages/container/${{ github.repository }}/versions" | jq -r ".[] | select(.metadata.container.tags[] == \"$IMAGE_TAG\") | .id")
+          
+          if [ -z "$PACKAGE_ID" ]; then
+            echo "No image found for tag $IMAGE_TAG."
+          else
+            # Supprime l'image avec l'ID du package
+            curl -s -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/orgs/YOUR_ORG/packages/container/${{ github.repository }}/versions/$PACKAGE_ID"
+            echo "Image with tag $IMAGE_TAG has been deleted."
+          fi
 
