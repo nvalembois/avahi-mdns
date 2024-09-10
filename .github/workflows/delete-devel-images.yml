@@ -11,10 +11,15 @@ env:
 jobs:
   delete-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Check if ref is a branch
         if: startsWith(github.event.ref, 'refs/heads/')
         run: echo "Branch ${GITHUB_REF} has been deleted."
+      - name: Debug
+        run: env
      
       - name: Login to registry ${{ env.DOCKER_REPOSITORY }}
         uses: docker/login-action@v3  # https://github.com/docker/login-action
