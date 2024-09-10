@@ -1,4 +1,4 @@
-name: Create release
+name: Create release, build and push image
 
 on:
   workflow_dispatch: # Permet le déclenchement manuel du workflow

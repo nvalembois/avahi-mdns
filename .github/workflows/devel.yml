@@ -1,4 +1,4 @@
-name: Build and test rust application
+name: Build image
 
 on:
   workflow_dispatch: # Permet le déclenchement manuel du workflow
