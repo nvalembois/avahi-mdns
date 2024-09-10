@@ -33,6 +33,8 @@ jobs:
           registry: ${{ env.DOCKER_REPOSITORY }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
+        env:
+          IMAGE_NAME: ${{ github.repository }}
       - 
         name: Build and push ${{ github.repository }}:${{ github.ref_name }}
         uses: docker/build-push-action@v6  # https://github.com/docker/build-push-action
