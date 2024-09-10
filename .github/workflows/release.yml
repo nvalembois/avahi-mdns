@@ -7,9 +7,6 @@ on:
       - closed
     branches: [ "latest" ]
     paths:
-      - 'src/**.rs'
-      - 'Cargo.lock'
-      - 'Cargo.toml'
       - 'Dockerfile'
 
 env:
