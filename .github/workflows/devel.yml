@@ -37,7 +37,7 @@ jobs:
         uses: docker/build-push-action@v6  # https://github.com/docker/build-push-action
         with:
           push: true
-          tags: ${{ github.repository }}:${{ github.ref }}
+          tags: ${{ github.repository }}:${{ github.ref_name }}
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
