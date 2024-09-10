@@ -10,4 +10,4 @@ COPY avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
 USER avahi
 
-CMD ["/usr/sbin/avahi-daemon", "--no-chroot", "--debug", "--no-drop-root"]
+CMD ["/usr/sbin/avahi-daemon", "--no-chroot", "--no-drop-root", "--debug"]
