@@ -27,6 +27,7 @@ jobs:
           IMAGE="${IMAGE_NAME%%*/}"
           echo "Get ${IMAGE} versions"
           versions="$(curl -s -H "$H" -H "$A" https://api.github.com/user/packages/container/${IMAGE}/versions)"
+          echo "Versions: $versions"
           filter='.[] | select(.metadata.container.tags[] == $v) | .id'
           PACKAGE_ID=$(echo $versions | jq --arg v ${{ github.event.ref }} -r "$filter")
           
