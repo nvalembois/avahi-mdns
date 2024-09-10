@@ -1,12 +1,10 @@
-name: Build and test rust application
+name: Build image
 
 on:
+  workflow_dispatch: # Permet le déclenchement manuel du workflow
   push:
     branches-ignore: [ "latest" ]
     paths:
-      - 'src/**.rs'
-      - 'Cargo.lock'
-      - 'Cargo.toml'
       - 'Dockerfile'
 
 env:
@@ -17,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
 
     steps:
       - 
@@ -34,13 +33,13 @@ jobs:
         with:
           registry: ${{ env.DOCKER_REPOSITORY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
       - 
-        name: Build and push ${{ github.repository }}:${{ github.ref }}
+        name: Build and push ${{ github.repository }}:${{ github.ref_name }}
         uses: docker/build-push-action@v6  # https://github.com/docker/build-push-action
         with:
           push: true
-          tags: ${{ github.repository }}:${{ github.ref }}
+          tags: ${{ env.DOCKER_REPOSITORY }}/${{ github.repository }}:${{ github.ref_name }}
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
