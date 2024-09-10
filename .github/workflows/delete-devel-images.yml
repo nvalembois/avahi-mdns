@@ -24,9 +24,10 @@ jobs:
         run: |
           H="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
           A='Accept: application/vnd.github+json'
-          IMAGE="${IMAGE_NAME%%*/}"
-          echo "Get ${IMAGE} versions"
-          versions="$(curl -s -H "$H" -H "$A" https://api.github.com/user/packages/container/${IMAGE}/versions)"
+          IMAGE="${IMAGE_NAME##*/}"
+          url="https://api.github.com/user/packages/container/${IMAGE}/versions"
+          echo "Get ${IMAGE} versions at $url"
+          versions="$(curl -s -H "$H" -H "$A" "$url")"
           echo "Versions: $versions"
           filter='.[] | select(.metadata.container.tags[] == $v) | .id'
           PACKAGE_ID=$(echo $versions | jq --arg v ${{ github.event.ref }} -r "$filter")
