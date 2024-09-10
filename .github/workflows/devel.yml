@@ -1,6 +1,7 @@
 name: Build and test rust application
 
 on:
+  workflow_dispatch: # Permet le déclenchement manuel du workflow
   push:
     branches-ignore: [ "latest" ]
     paths:
