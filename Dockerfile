@@ -1,7 +1,7 @@
 
 FROM docker.io/library/alpine:3.20.3
 
-RUN set -e && \
+RUN set -Eeuo pipefail && \
   apk add --no-cache avahi && \
   rm /etc/avahi/services/*.service && \
   install -d -o avahi -g avahi -m 0755 /run/avahi-daemon
