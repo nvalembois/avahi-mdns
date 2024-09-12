@@ -1,8 +1,7 @@
 name: Delete Image on Branch Deletion
 
 on:
-  delete:
-    branches: [ '*' ]
+  delete
 
 env:
   DOCKER_REPOSITORY: ghcr.io
